@@ -2,13 +2,12 @@ version: "3.8"
 services:
   pg:
     container_name: pg_container
-    image: postgres
+    image: postgres:15.4-alpine
     restart: always
     environment:
+      POSTGRES_DB: horoscopes_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admin123
-      POSTGRES_DB: horoscopes_db
-      POSTGRES_HOST_AUTH_METHOD: trust
     ports:
       - "5432:5432"
     volumes:
