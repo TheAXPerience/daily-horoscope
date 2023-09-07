@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'cors_headers',
+    'corsheaders',
     'rest_framework_simplejwt',
     'authenticate'
 ]
@@ -135,7 +135,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Custom: Authentication
 AUTH_USER_MODEL = "authenticate.CustomUser"
 
-CORS_ALLOWED_ORIGINS = ['*']
+CORS_ALLOWED_ORIGINS = ['http://127.0.0.1:8000']
 CORS_ALLOW_CREDENTIALS = True
 
 REST_FRAMEWORK = {
@@ -179,7 +179,7 @@ SIMPLE_JWT = {
     'AUTH_COOKIE': 'refresh_token',
     'AUTH_COOKIE_DOMAIN': None,
     'AUTH_COOKIE_SECURE': False,
-    'AUTH_COOKIE_HTTO_ONLY': True,
+    'AUTH_COOKIE_HTTP_ONLY': True,
     'AUTH_COOKIE_PATH': '/auth/refresh',
     'AUTH_COOKIE_SAMESITE': 'Lax',
 }
