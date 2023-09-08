@@ -9,20 +9,25 @@ class RegisterVerifier:
         self._errors = []
     
     def verify(self):
+        # always check if keys exist
         self.verify_exists('email')
         self.verify_exists('username')
         self.verify_exists('password')
         self.verify_exists('date_of_birth')
         self.verify_exists('accept_tos')
 
-        self.verify_date('date_of_birth')
-        self.verify_email('email')
-        self.verify_email_not_exists('email')
-        self.verify_username_not_exists('username')
-        self.verify_length('email', 3, 255)
-        self.verify_length('username', 3, 255)
-        self.verify_length('password', 8, 255)
-        self.verify_true_or_false('accept_tos')
+        # should be done beforehand
+        self.verify_length('password', 8, 255)          # will be hashed so verify now
+        self.verify_length('email', 3, 255)             # DataError - may as well verify here
+        self.verify_length('username', 3, 255)          # DataError - may as well verify here
+        self.verify_true_or_false('accept_tos')         # could be anything else
+
+        # can be done by model but done here since I already did the work :)
+        self.verify_date('date_of_birth')               # ValidationError
+        self.verify_email('email')                      # ValidationError
+        self.verify_email_not_exists('email')           # IntegrityError
+        self.verify_username_not_exists('username')     # IntegrityError
+        
         return len(self._errors) == 0
     
     def errors(self):
