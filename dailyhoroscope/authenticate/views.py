@@ -1,14 +1,19 @@
+from datetime import datetime
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.shortcuts import render
+from django.utils import timezone
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.views import APIView
+from .authentication import PASSWORD_CHANGED_ERROR_MESSAGE
 from .models import CustomUser
+
+REFRESH_TOKEN_EXPIRED_MESSAGE = 'Refresh token has expired. Please login again.'
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
@@ -126,10 +131,22 @@ class RefreshView(APIView):
         
         # verify token, get user, and generate new tokens
         token = RefreshToken(raw_token)
+        issue_date = datetime.fromtimestamp(token['iat'], tz=timezone.utc)
+        expire_date = datetime.fromtimestamp(token['exp'], tz=timezone.utc)
+        if expire_date > timezone.now():
+            return Response(
+                {'Invalid': REFRESH_TOKEN_EXPIRED_MESSAGE},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
 
         # TODO: blacklist here
         jwt = JWTAuthentication()
         user = jwt.get_user(token)
+        if issue_date < user.last_password_change:
+            return Response(
+                {'Invalid': PASSWORD_CHANGED_ERROR_MESSAGE},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
         data = get_tokens_for_user(user)
 
         # re-set the cookie to new refresh token, and return both tokens
@@ -154,3 +171,45 @@ class UserView(APIView):
 
     def get(self, request):
         return Response(data=request.user.serialize())
+
+class ChangePasswordView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def put(self, request):
+        old_password = request.data['old_password']
+        new_password = request.data['new_password']
+        user = request.user
+        if user is None:
+            return Response(
+                {'Invalid', 'User is not authenticated.'},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        if not user.check_password(old_password):
+            return Response(
+                {'Invalid': 'Entered incorrect password. Password change denied.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        user.set_password(new_password)
+        user.last_password_change = timezone.now()
+        user.save()
+        
+        data = get_tokens_for_user(user)
+
+        # re-set the cookie to new refresh token, and return both tokens
+        response = Response(
+            {"Success": "Password changed successfully.", 'data': data},
+            status=status.HTTP_202_ACCEPTED,
+        )
+        response.set_cookie(
+            key=settings.SIMPLE_JWT['AUTH_COOKIE'],
+            value=data['refresh'],
+            expires=settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'],
+            secure=settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
+            httponly=settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
+            samesite=settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE'],
+            path=settings.SIMPLE_JWT['AUTH_COOKIE_PATH'],
+        )
+        return response
+        

@@ -140,7 +140,8 @@ CORS_ALLOW_CREDENTIALS = True
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication', # change to custom, cuz we doin cookies
+        'authenticate.authentication.CustomAuthentication',
+        # 'rest_framework_simplejwt.authentication.JWTAuthentication', # change to custom, cuz we doin cookies
     ),
 }
 

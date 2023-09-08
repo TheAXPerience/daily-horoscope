@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 
@@ -39,6 +40,7 @@ class CustomUser(AbstractUser):
     is_active = models.BooleanField(default=True) # set to False when doing account activation
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
+    last_password_change = models.DateTimeField(default=timezone.now)
 
     objects = UserManager()
     USERNAME_FIELD = 'email'
