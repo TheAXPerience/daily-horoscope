@@ -1,4 +1,6 @@
 import datetime
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 from .models import CustomUser
 
 class RegisterVerifier:
@@ -12,9 +14,14 @@ class RegisterVerifier:
         self.verify_exists('password')
         self.verify_exists('date_of_birth')
         self.verify_exists('accept_tos')
+
         self.verify_date('date_of_birth')
+        self.verify_email('email')
         self.verify_email_not_exists('email')
         self.verify_username_not_exists('username')
+        self.verify_length('email', 3, 255)
+        self.verify_length('username', 3, 255)
+        self.verify_length('password', 8, 255)
         self.verify_true_or_false('accept_tos')
         return len(self._errors) == 0
     
@@ -36,6 +43,15 @@ class RegisterVerifier:
         except ValueError:
             self._errors.append(f'{key} field must contains a valid Date in format "YYYY-MM-DD".')
     
+    def verify_email(self, key):
+        if key not in self._data:
+            return
+        val = self._data[key]
+        try:
+            validate_email(val)
+        except ValidationError:
+            self._errors.append(f'{key} field must be a valid email address.')
+
     def verify_email_not_exists(self, key):
         if key not in self._data:
             return
@@ -56,3 +72,15 @@ class RegisterVerifier:
         val = self._data[key]
         if val != "TRUE" and val != "FALSE":
             self._errors.append(f'{key} field must be either "TRUE" or "FALSE".')
+    
+    def verify_length(self, key, min, max):
+        if key not in self._data:
+            return
+        val = self._data[key]
+        if len(val) < min:
+            self._errors.append(f'{key} field must have a length greater than or equal to {min}.')
+        elif len(val) > max:
+            self._errors.append(f'{key} field must have a length less than or equal to {max}.')
+    
+    # verify username characters (only alphanumeric?)
+    # verify password... ???

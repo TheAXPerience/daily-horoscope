@@ -30,39 +30,6 @@ class RegisterView(APIView):
         data = request.data
 
         # parse errors from missing data
-        """
-        if 'email' not in data:
-            return Response(
-                {'Invalid': 'Email field must not be empty'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        if 'username' not in data:
-            return Response(
-                {'Invalid': 'Username field must not be empty'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        if 'password' not in data:
-            return Response(
-                {'Invalid': 'Password field must not be empty'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        if 'date_of_birth' not in data:
-            return Response(
-                {'Invalid': 'Date of Birth field must not be empty'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        if 'accept_tos' not in data:
-            return Response(
-                {'Invalid': 'Terms of Service Acceptance field must not be empty'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        if data['accept_tos'] != "TRUE" and data['accept_tos'] != 'FALSE':
-            return Response(
-                {'Invalid': 'Terms of Service Acceptance field must be either "TRUE" or "FALSE"'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        """
-        
         verifier = RegisterVerifier(data)
         if not verifier.verify():
             return Response(
@@ -78,17 +45,20 @@ class RegisterView(APIView):
                 date_of_birth=data['date_of_birth'],
                 accept_tos=(data['accept_tos'] == "TRUE")
             )
+            user.set_password(data['password'])
+            user.full_clean()
         except ValidationError as error:
+            user.delete()
             return Response(
                 {'Invalid': error},
                 status=status.HTTP_400_BAD_REQUEST
             )
         except IntegrityError as error:
+            user.delete()
             return Response(
                 {'Invalid': str(error.__cause__).split('  ')[1][:-1]},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        user.set_password(data['password'])
         user.save()
         return Response(
             data={'Accepted': 'New user registered', 'data': user.serialize()}
