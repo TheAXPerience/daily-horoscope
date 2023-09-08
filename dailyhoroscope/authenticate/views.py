@@ -12,6 +12,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.views import APIView
 from .authentication import PASSWORD_CHANGED_ERROR_MESSAGE
 from .models import CustomUser
+from .verifier import RegisterVerifier
 
 REFRESH_TOKEN_EXPIRED_MESSAGE = 'Refresh token has expired. Please login again.'
 
@@ -29,6 +30,7 @@ class RegisterView(APIView):
         data = request.data
 
         # parse errors from missing data
+        """
         if 'email' not in data:
             return Response(
                 {'Invalid': 'Email field must not be empty'},
@@ -59,7 +61,15 @@ class RegisterView(APIView):
                 {'Invalid': 'Terms of Service Acceptance field must be either "TRUE" or "FALSE"'},
                 status=status.HTTP_400_BAD_REQUEST
             )
+        """
         
+        verifier = RegisterVerifier(data)
+        if not verifier.verify():
+            return Response(
+                {'message': verifier.errors()},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         # create and save new user
         try:
             user = CustomUser.objects.create(
