@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'rest_framework_simplejwt',
-    'authenticate'
+    'authenticate',
+    'horoscope',
 ]
 
 MIDDLEWARE = [

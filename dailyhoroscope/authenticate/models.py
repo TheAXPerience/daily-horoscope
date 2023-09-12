@@ -3,6 +3,13 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 
 # Create your models here.
+def get_sentinel_user():
+    from django.contrib.auth import get_user_model
+    return get_user_model().objects.get_or_create(
+        email="deleted@deleted.deleted",
+        username="deleted"
+    )[0]
+
 class UserManager(BaseUserManager):
     use_in_migration = True
 
@@ -52,4 +59,28 @@ class CustomUser(AbstractUser):
             "email": self.email,
             "date_of_birth": self.date_of_birth
         }
+        return ans
+
+class UserProfile(models.Model):
+    user = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name="profile"
+    )
+    # profile picture?
+    description = models.TextField(null=True)
+    dob_public = models.BooleanField(default=False)
+    email_public = models.BooleanField(default=False)
+    subscribed_to_newsletter = models.BooleanField(default=False)
+
+    def serialize(self):
+        ans = {
+            "username": self.user.username,
+            "description": self.description,
+            "subscribed_to_newsletter": self.subscribed_to_newsletter,
+        }
+        if self.email_public:
+            ans['email'] = self.user.email
+        if self.dob_public:
+            ans['date_of_birth'] = self.user.date_of_birth
         return ans
