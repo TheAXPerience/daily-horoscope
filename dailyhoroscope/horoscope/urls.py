@@ -6,5 +6,6 @@ urlpatterns = [
     path('', views.HoroscopeView.as_view(), 'horoscope_view'),
     path('<int:hid>', views.SingularHoroscopeView.as_view(), 'singular_horoscope_view'),
     path('report/<int:hid>', views.ReportHoroscopeView.as_view(), 'report_horoscope_view'),
-    path('user/<str:username>', views.UserHoroscipeView.as_view(), 'user_horoscope_view'),
+    path('user/<str:username>', views.UserHoroscopeView.as_view(), 'user_horoscope_view'),
+    path('daily/<str:date>', views.DailyHoroscopeView.as_view(), 'daily_horoscope_view'),
 ]
