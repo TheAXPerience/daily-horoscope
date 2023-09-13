@@ -102,7 +102,7 @@ class LoginView(APIView):
 class RefreshView(APIView):
     def post(self, request):
         # find raw refresh token in cookies; else invalid
-        raw_token = request.COOKIES.get('refresh_token') or None
+        raw_token = request.COOKIES.get(settings.SIMPLE_JWT['AUTH_COOKIE']) or None
         if raw_token is None:
             return Response(
                 {"Invalid": "Invalid token submitted."},
@@ -193,3 +193,19 @@ class ChangePasswordView(APIView):
         )
         return response
         
+class LogoutView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def post(self, request):
+        response = Response(
+            {'Success': 'Successfully logged out.'},
+            status=status.HTTP_200_OK,
+        )
+        response.set_cookie(
+            key=settings.SIMPLE_JWT['AUTH_COOKIE'],
+            value='',
+            max_age=1,
+            secure=settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
+            httponly=settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
+            samesite=settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE'],
+            path=settings.SIMPLE_JWT['AUTH_COOKIE_PATH'],        )
+        return response
