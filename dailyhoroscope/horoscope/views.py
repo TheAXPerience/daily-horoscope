@@ -42,11 +42,11 @@ class DailyHoroscopeView(APIView):
         pass
 
 # GET: all horoscopes (paginated) of a user
-class HoroscopesOfUserView(APIView):
+class UserHoroscopeView(APIView):
     def get(self, request, username):
         pass
 
 # POST: report a horoscope for inappropriate content
-class ReportHoroscope(APIView):
+class ReportHoroscopeView(APIView):
     def post(self, request, hid):
         pass
