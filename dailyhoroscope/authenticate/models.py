@@ -62,7 +62,7 @@ class CustomUser(AbstractUser):
         return ans
 
 class UserProfile(models.Model):
-    user = models.ForeignKey(
+    user = models.OneToOneField(
         CustomUser,
         on_delete=models.CASCADE,
         related_name="profile"

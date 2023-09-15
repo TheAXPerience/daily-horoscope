@@ -46,7 +46,7 @@ class RegisterVerifier:
         try:
             datetime.date.fromisoformat(date)
         except ValueError:
-            self._errors.append(f'{key} field must contains a valid Date in format "YYYY-MM-DD".')
+            self._errors.append(f'{key} field must contain a valid Date in format "YYYY-MM-DD".')
     
     def verify_email(self, key):
         if key not in self._data:

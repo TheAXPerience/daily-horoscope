@@ -21,6 +21,7 @@ class Horoscope(models.Model):
 
     def serialize(self):
         return {
+            "id": self.id,
             "username": self.poster.username,
             "horoscope": self.horoscope,
             "time_posted": self.date_posted,
@@ -29,18 +30,18 @@ class Horoscope(models.Model):
 
 class DailyHoroscope(models.Model):
     date = models.DateField(auto_now_add=True)
-    aries = models.ForeignKey(Horoscope, on_delete=get_default_horoscope)
-    taurus = models.ForeignKey(Horoscope, on_delete=get_default_horoscope)
-    gemini = models.ForeignKey(Horoscope, on_delete=get_default_horoscope)
-    cancer = models.ForeignKey(Horoscope, on_delete=get_default_horoscope)
-    leo = models.ForeignKey(Horoscope, on_delete=get_default_horoscope)
-    virgo = models.ForeignKey(Horoscope, on_delete=get_default_horoscope)
-    libra = models.ForeignKey(Horoscope, on_delete=get_default_horoscope)
-    scorpio = models.ForeignKey(Horoscope, on_delete=get_default_horoscope)
-    sagittarius = models.ForeignKey(Horoscope, on_delete=get_default_horoscope)
-    capricorn = models.ForeignKey(Horoscope, on_delete=get_default_horoscope)
-    aquarius = models.ForeignKey(Horoscope, on_delete=get_default_horoscope)
-    pisces = models.ForeignKey(Horoscope, on_delete=get_default_horoscope)
+    aries = models.ForeignKey(Horoscope, on_delete=get_default_horoscope, related_name='+')
+    taurus = models.ForeignKey(Horoscope, on_delete=get_default_horoscope, related_name='+')
+    gemini = models.ForeignKey(Horoscope, on_delete=get_default_horoscope, related_name='+')
+    cancer = models.ForeignKey(Horoscope, on_delete=get_default_horoscope, related_name='+')
+    leo = models.ForeignKey(Horoscope, on_delete=get_default_horoscope, related_name='+')
+    virgo = models.ForeignKey(Horoscope, on_delete=get_default_horoscope, related_name='+')
+    libra = models.ForeignKey(Horoscope, on_delete=get_default_horoscope, related_name='+')
+    scorpio = models.ForeignKey(Horoscope, on_delete=get_default_horoscope, related_name='+')
+    sagittarius = models.ForeignKey(Horoscope, on_delete=get_default_horoscope, related_name='+')
+    capricorn = models.ForeignKey(Horoscope, on_delete=get_default_horoscope, related_name='+')
+    aquarius = models.ForeignKey(Horoscope, on_delete=get_default_horoscope, related_name='+')
+    pisces = models.ForeignKey(Horoscope, on_delete=get_default_horoscope, related_name='+')
 
     def serialize(self):
         return {
@@ -61,7 +62,7 @@ class DailyHoroscope(models.Model):
 
 class ReportHoroscope(models.Model):
     date_reported = models.DateTimeField(auto_now_add=True)
-    reported_horoscope = models.ForeignKey(Horoscope, on_delete=models.CASCADE)
+    reported_horoscope = models.ForeignKey(Horoscope, on_delete=models.CASCADE, related_name='+')
     reason = models.TextField(default="")
     reviewed = models.BooleanField(default=False)
 
