@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
+from django.utils.html import escape
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -174,7 +175,7 @@ class ProfileChangesView(APIView):
     def put(self, request):
         profile = request.user.profile
         if "description" in request.data:
-            profile.description = request.data["description"]
+            profile.description = escape(request.data["description"])
         if "dob_public" in request.data:
             profile.dob_public = request.data["dob_public"]
         if "email_public" in request.data:
@@ -268,3 +269,8 @@ class LogoutView(APIView):
             path=settings.SIMPLE_JWT['AUTH_COOKIE_PATH'],
         )
         return response
+
+class TermsOfServiceView(APIView):
+    def get(self, request):
+        from .termsofservice import TERMS_OF_SERVICE
+        return Response(TERMS_OF_SERVICE)

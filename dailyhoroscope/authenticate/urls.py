@@ -10,4 +10,5 @@ urlpatterns = [
     path('refresh', views.RefreshView.as_view(), name='refresh_view'),
     path('logout', views.LogoutView.as_view(), name='logout_view'),
     path('profile', views.ProfileChangesView.as_view(), name='profile_view'),
+    path('termsofservice', views.TermsOfServiceView.as_view(), name='terms_of_service_view'),
 ]

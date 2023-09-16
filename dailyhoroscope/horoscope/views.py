@@ -1,9 +1,6 @@
 import datetime
-from django.conf import settings
-from django.core.exceptions import ValidationError
-from django.db import IntegrityError
 from django.shortcuts import get_object_or_404, render
-from django.utils import timezone
+from django.utils.html import escape
 from rest_framework import permissions, status 
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -18,14 +15,14 @@ class HoroscopeView(APIView):
 
     def post(self, request):
         user = request.user
-        data = request.data
-        if "horoscope" not in data:
+        
+        if "horoscope" not in request.data:
             return Response(
                 data={'message', 'Request did not contain a "horoscope" field.'},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        
-        horoscope = Horoscope(poster=user, horoscope=data["horoscope"])
+        txt = escape(request.data["horoscope"])
+        horoscope = Horoscope(poster=user, horoscope=txt)
         horoscope.save()
         return Response(
             data={
@@ -66,7 +63,7 @@ class SingularHoroscopeView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        horoscope.horoscope = request.data["horoscope"]
+        horoscope.horoscope = escape(request.data["horoscope"])
         horoscope.save()
         return Response(
             data={
@@ -156,7 +153,7 @@ class ReportHoroscopeView(APIView):
         
         report = ReportHoroscope(
             reported_horoscope=horoscope, 
-            reason=request.data["reason"],
+            reason=escape(request.data["reason"]),
             reviewed=False
         )
         report.save()
