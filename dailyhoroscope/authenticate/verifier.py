@@ -41,6 +41,9 @@ class RegisterVerifier:
     def errors(self):
         return self._errors
 
+    def has_errors(self):
+        return len(self._errors) == 0
+
     def verify_exists(self, key):
         if key not in self._data:
             self._errors.append(f'{key} field must not be empty.')

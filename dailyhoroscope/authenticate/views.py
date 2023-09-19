@@ -222,7 +222,15 @@ class ChangePasswordView(APIView):
                 {'message': 'Entered incorrect password. Password change denied.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
+        verifier = RegisterVerifier({'password': new_password})
+        verifier.verify_password('password')
+        if verifier.has_errors():
+            return Response(
+                {'message': verifier.errors()[0]},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         user.set_password(new_password)
         user.last_password_change = timezone.now()
         user.save()
