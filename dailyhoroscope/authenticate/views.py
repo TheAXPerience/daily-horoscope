@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
@@ -62,7 +62,7 @@ class RegisterView(APIView):
             )
         user.save()
         return Response(
-            data={'message': 'New user registered', 'data': user.serialize()}
+            data={'message': 'New user registered.', 'data': user.serialize()}
         )
 
 # log into an existing user account
@@ -112,8 +112,8 @@ class RefreshView(APIView):
         
         # verify token, get user, and generate new tokens
         token = RefreshToken(raw_token)
-        issue_date = datetime.fromtimestamp(token['iat'], tz=timezone.utc)
-        expire_date = datetime.fromtimestamp(token['exp'], tz=timezone.utc)
+        issue_date = datetime.datetime.fromtimestamp(token['iat'], tz=datetime.timezone.utc)
+        expire_date = datetime.datetime.fromtimestamp(token['exp'], tz=datetime.timezone.utc)
         if expire_date < timezone.now():
             return Response(
                 {'message': REFRESH_TOKEN_EXPIRED_MESSAGE},

@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime
 from django.utils import timezone
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.exceptions import AuthenticationFailed
@@ -19,7 +19,7 @@ class CustomAuthentication(JWTAuthentication):
 
         # add a second to take into account milliseconds being stored in the database value
         # i do not know how else to deal with this
-        issue_date = datetime.fromtimestamp(validated_token['iat'], tz=timezone.utc) + timezone.timedelta(seconds=1)
+        issue_date = datetime.datetime.fromtimestamp(validated_token['iat'], tz=datetime.timezone.utc) + timezone.timedelta(seconds=1)
         if issue_date < user.last_password_change:
             # functionality: error if issue date is before last password change
             raise AuthenticationFailed(PASSWORD_CHANGED_ERROR_MESSAGE)
