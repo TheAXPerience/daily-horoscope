@@ -160,8 +160,9 @@ class UserView(APIView):
             )
         return Response(data=user.profile.serialize())
 
-# TODO: process changes to profile settings, and deleting an account
 class ProfileChangesView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
     def get(self, request):
         profile = request.user.profile
         context = {
@@ -208,8 +209,13 @@ class ChangePasswordView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def put(self, request):
-        old_password = request.data['old_password']
-        new_password = request.data['new_password']
+        old_password = request.data['old_password'] if 'old_password' in request.data else None
+        new_password = request.data['new_password'] if 'new_password' in request.data else None
+        if old_password is None or new_password is None:
+            return Response(
+                {'message': 'Incorrect/missing data submitted.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         user = request.user
         if user is None:
             return Response(

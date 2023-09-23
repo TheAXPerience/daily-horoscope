@@ -42,7 +42,7 @@ class RegisterVerifier:
         return self._errors
 
     def has_errors(self):
-        return len(self._errors) == 0
+        return len(self._errors) > 0
 
     def verify_exists(self, key):
         if key not in self._data:

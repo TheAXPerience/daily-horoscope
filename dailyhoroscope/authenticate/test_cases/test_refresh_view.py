@@ -5,6 +5,7 @@ from django.urls import reverse
 from time import sleep
 
 # if this fails because of a timeout error, it's bc the last_password_change time... is the same time
+# hopefully 1 second of sleep fixes that
 def test_post(client, user1):
     sleep(1)
     data = {
