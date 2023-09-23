@@ -1,5 +1,2 @@
-def test_get():
-    pass
-
-def test_get_specific_date():
+def test_get(dailyhoroscope):
     pass
