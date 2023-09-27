@@ -1,6 +1,6 @@
 import datetime
 import pytest
-from horoscope.models import Horoscope, DailyHoroscope
+from horoscope.models import Horoscope, DailyHoroscope, ReportHoroscope
 
 @pytest.fixture
 def user1(db, django_user_model):
@@ -67,3 +67,33 @@ def dailyhoroscope(horoscope1, horoscope2, horoscope3):
         pisces=horoscope2
     )
     yield horoscopes
+
+@pytest.fixture
+def dailyhoroscope2(horoscope1, horoscope2, horoscope3):
+    horoscopes = DailyHoroscope.objects.create(
+        aries=horoscope1,
+        taurus=horoscope2,
+        gemini=horoscope1,
+        cancer=horoscope1,
+        leo=horoscope3,
+        virgo=horoscope2,
+        libra=horoscope1,
+        scorpio=horoscope3,
+        sagittarius=horoscope2,
+        capricorn=horoscope3,
+        aquarius=horoscope3,
+        pisces=horoscope2
+    )
+    horoscopes.date = datetime.date(2021, 10, 20)
+    horoscopes.save()
+    yield horoscopes
+
+@pytest.fixture
+def reporthoroscope(horoscope1):
+    report = ReportHoroscope.objects.create(
+        reported_horoscope=horoscope1,
+        reason='Because I said so',
+        reviewed=True
+    )
+
+    yield report

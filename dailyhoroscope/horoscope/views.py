@@ -18,7 +18,7 @@ class HoroscopeView(APIView):
         
         if "horoscope" not in request.data:
             return Response(
-                data={'message', 'Request did not contain a "horoscope" field.'},
+                data={'message': 'Request did not contain a "horoscope" field.'},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         txt = escape(request.data["horoscope"])
@@ -26,7 +26,7 @@ class HoroscopeView(APIView):
         horoscope.save()
         return Response(
             data={
-                'message': 'Horoscope has been successfully uploaded',
+                'message': 'Horoscope has been successfully uploaded.',
                 'data': horoscope.serialize(),
             }, status=status.HTTP_201_CREATED,
         )
@@ -58,7 +58,7 @@ class SingularHoroscopeView(APIView):
         if "horoscope" not in request.data:
             return Response(
                 data={
-                    'message': 'No data found in the request to replace.'
+                    'message': 'A change in data was not submitted.'
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )

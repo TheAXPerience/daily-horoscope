@@ -2,6 +2,8 @@ from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 
+DATEOFBIRTH_FORMAT = '%Y/%m/%d'
+
 # Create your models here.
 def get_sentinel_user():
     from django.contrib.auth import get_user_model
@@ -57,7 +59,7 @@ class CustomUser(AbstractUser):
         ans = {
             "username": self.username,
             "email": self.email,
-            "date_of_birth": self.date_of_birth
+            "date_of_birth": self.date_of_birth.strftime(DATEOFBIRTH_FORMAT)
         }
         return ans
 
@@ -82,5 +84,5 @@ class UserProfile(models.Model):
         if self.email_public:
             ans['email'] = self.user.email
         if self.dob_public:
-            ans['date_of_birth'] = self.user.date_of_birth
+            ans['date_of_birth'] = self.user.date_of_birth.strftime(DATEOFBIRTH_FORMAT)
         return ans

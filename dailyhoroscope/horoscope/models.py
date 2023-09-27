@@ -1,6 +1,9 @@
 from django.db import models
 from authenticate.models import CustomUser, get_sentinel_user
 
+DATE_FORMAT = '%Y/%m/%d'
+DATETIME_FORMAT = '%Y/%m/%d %H:%M'
+
 # TODO: set up default horoscope for "deleted"
 def get_default_horoscope():
     return Horoscope.objects.get_or_create(
@@ -24,8 +27,8 @@ class Horoscope(models.Model):
             "id": self.id,
             "username": self.poster.username,
             "horoscope": self.horoscope,
-            "time_posted": self.date_posted,
-            "last_updated": self.date_updated
+            "time_posted": self.date_posted.strftime(DATETIME_FORMAT),
+            "last_updated": self.date_updated.strftime(DATETIME_FORMAT)
         }
 
 class DailyHoroscope(models.Model):
@@ -45,7 +48,7 @@ class DailyHoroscope(models.Model):
 
     def serialize(self):
         return {
-            "date": self.date,
+            "date": self.date.strftime(DATE_FORMAT),
             "aries": self.aries.serialize(),
             "taurus": self.taurus.serialize(),
             "gemini": self.gemini.serialize(),
@@ -68,7 +71,7 @@ class ReportHoroscope(models.Model):
 
     def serialize(self):
         return {
-            "date_reported": self.date_reported,
+            "date_reported": self.date_reported.strftime(DATETIME_FORMAT),
             "horoscope": self.reported_horoscope.serialize(),
             "reason": self.reason,
             "reviewed": self.reviewed,
