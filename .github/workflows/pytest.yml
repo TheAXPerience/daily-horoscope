@@ -48,17 +48,16 @@ jobs:
       - uses: actions/checkout@v2
       
       # Uses the action setup-python@v2, specifying version 3.9
-      # This installs Python 3.9 to the runner environment
-      - name: Set up Python 3.9
+      # This installs Python 3.11 to the runner environment
+      - name: Set up Python 3.11
         uses: actions/setup-python@v2
         with:
-          python-version: 3.9
+          python-version: 3.11
       # Runs a set of commands to install dependencies in the runner environment
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r dailyhoroscope/requirements.txt
-          python -m pip install pytest pytest-django
      
       # Runs database migrations on the Django app
       - name: Run migrations
@@ -69,4 +68,4 @@ jobs:
       # Run all tests with verbose flag
       - name: Run all tests
         working-directory: ./dailyhoroscope
-        run: pytest -v
+        run: pytest
