@@ -1,0 +1,70 @@
+name: daily-horoscopes Testing Workflow
+
+# Set up how the workflow is triggered
+on:
+
+  # Trigger the workflow on push or pull request events on the main branch
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+  # Allow triggering this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Set up the job for this workflow
+jobs:
+  # This workflow contains a single job that we are calling "build-and-test"
+  django_test:
+
+    # The runner environment to use
+    runs-on: ubuntu-latest
+    
+    # Set up Postgres
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: horoscopes_db
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: admin123
+        ports:
+          - 5432:5432
+        # Set health checks to wait until postgres has started
+        options:
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+
+    # Steps mostly contain CLI commands (via "run") and actions (via "uses")
+    # Each step begins with a hyphen -
+    steps:       
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      # You can optionally provide a name before a step. This is an example of an unnamed step.
+      - uses: actions/checkout@v2
+      
+      # Uses the action setup-python@v2, specifying version 3.9
+      # This installs Python 3.9 to the runner environment
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      # Runs a set of commands to install dependencies in the runner environment
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r dailyhoroscope/requirements.txt
+          python -m pip install pytest pytest-django
+     
+      # Runs database migrations on the Django app
+      - name: Run migrations
+        run: python dailyhoroscope/manage.py migrate
+      
+      # Run all tests with verbose flag
+      - name: Run all tests
+        working-directory: ./dailyhoroscope
+        run: pytest -v
