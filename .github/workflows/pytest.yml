@@ -59,6 +59,10 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r dailyhoroscope/requirements.txt
           python -m pip install pytest pytest-django
+
+      # Makes database migrations on the Django app
+      - name: Make migrations
+        run: python dailyhoroscope/manage.py makemigrations
      
       # Runs database migrations on the Django app
       - name: Run migrations
