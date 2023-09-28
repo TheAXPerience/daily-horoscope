@@ -2,6 +2,7 @@ django
 djangorestframework
 djangorestframework-simplejwt
 django-cors-headers
+django-ses
 gunicorn
 python-decouple
 psycopg2-binary
