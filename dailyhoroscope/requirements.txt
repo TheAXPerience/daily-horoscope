@@ -3,6 +3,7 @@ djangorestframework
 djangorestframework-simplejwt
 django-cors-headers
 django-ses
+django-environ
 gunicorn
 python-decouple
 psycopg2-binary

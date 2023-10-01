@@ -10,12 +10,17 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import environ
+import os
 from datetime import timedelta
 from pathlib import Path
+from decouple import config
+
+env = environ.Env(DEBUG=(bool, True))
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -83,11 +88,11 @@ WSGI_APPLICATION = 'dailyhoroscope.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'horoscopes_db',
-        'USER': 'postgres',
-        'PASSWORD': 'admin123',
-        'HOST': '127.0.0.1',
-        'PORT': '5432'
+        'NAME': env('POSTGRES_DATABASE_NAME'),
+        'USER': env('POSTGRES_USERNAME'),
+        'PASSWORD': env('POSTGRES_PASSWORD'),
+        'HOST': env('POSTGRES_HOST_IP'),
+        'PORT': env('POSTGRES_HOST_PORT')
     }
 }
 
@@ -185,3 +190,20 @@ SIMPLE_JWT = {
     'AUTH_COOKIE_PATH': '/auth/refresh',
     'AUTH_COOKIE_SAMESITE': 'Lax',
 }
+
+# email support
+"""
+EMAIL_BACKEND = 'django_ses.SESBackend'
+
+    do not want to do this unless ave a proper web domain
+    since we need to actually apply to get out of sandbox mode
+AWS_SES_REGION_NAME = env('AWS_REGION')
+AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY')
+"""
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = env('APPLICATION_EMAIL_ADDRESS')
+EMAIL_HOST_PASSWORD = env('APPLICATION_EMAIL_PASSWORD')
+EMAIL_USE_TLS = True

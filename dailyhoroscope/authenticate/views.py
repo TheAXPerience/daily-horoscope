@@ -12,6 +12,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.views import APIView
 from .authentication import PASSWORD_CHANGED_ERROR_MESSAGE
+from .email import send_reset_email, ResetToken
 from .models import CustomUser
 from .verifier import RegisterVerifier
 
@@ -258,7 +259,67 @@ class ChangePasswordView(APIView):
             path=settings.SIMPLE_JWT['AUTH_COOKIE_PATH'],
         )
         return response
+
+class ResetPasswordRequestView(APIView):
+    def post(self, request):
+        if 'email' not in request.data or 'date_of_birth' not in request.data:
+            return Response(
+                data={'message': 'The "email" and "date_of_birth" fields must be included.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         
+        user = get_object_or_404(CustomUser, email=request.data['email'])
+        dob = datetime.date.fromisoformat(request.data['date_of_birth'])
+        if (dob != user.date_of_birth):
+            return Response(
+                data={'message': 'The given date of birth is incorrect for the account with the given email address.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        send_reset_email(user)
+
+        return Response(
+            {'message': 'Password reset email has been sent.'},
+            status=status.HTTP_200_OK
+        )
+
+class ResetPasswordView(APIView):
+    def post(self, request):
+        if 'password' not in request.data or 'token' not in request.data:
+            return Response(
+                {'message': 'Invalid password reset request.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        token = ResetToken(request.data['token'])
+        expire_date = datetime.datetime.fromtimestamp(token['exp'], tz=datetime.timezone.utc)
+        if expire_date < timezone.now():
+            return Response(
+                {'message': 'The token has passed its expiration date.'},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+        
+        new_password = request.data['password']
+        verifier = RegisterVerifier({'password': new_password})
+        verifier.verify_password('password')
+        if verifier.has_errors():
+            return Response(
+                {'message': verifier.errors()[0]},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        jwt = JWTAuthentication()
+        user = jwt.get_user(token)
+
+        user.set_password(new_password)
+        user.last_password_change = timezone.now()
+        user.save()
+
+        return Response(
+            {'message': 'Password changed successfully.'},
+            status=status.HTTP_202_ACCEPTED
+        )
+
 class LogoutView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     def post(self, request):
